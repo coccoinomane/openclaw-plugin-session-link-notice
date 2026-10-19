@@ -56,5 +56,8 @@
     "afterInactivity.minutes": {
       "label": "Inactivity threshold (minutes)"
     }
+  },
+  "activation": {
+    "onStartup": true
   }
 }

@@ -6,6 +6,8 @@ By default, the first eligible human request observed in each session incarnatio
 
 ## Options
 
+Enable plugins.entries.session-link-notice.hooks.allowConversationAccess for the observation hook. This is an SDK requirement even though the implementation ignores conversation text. Do not set hooks.allowPromptInjection to false: the host blocks before_prompt_build entirely in that case. The handler itself returns no prompt contribution.
+
 Configure under plugins.entries.session-link-notice.config:
 
 ~~~json
