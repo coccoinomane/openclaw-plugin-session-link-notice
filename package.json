@@ -1,0 +1,23 @@
+{
+  "name": "openclaw-plugin-session-link-notice",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "description": "Deterministic channel-only links to OpenClaw sessions",
+  "scripts": {
+    "test": "node --test"
+  },
+  "openclaw": {
+    "extensions": [
+      "./index.js"
+    ]
+  },
+  "peerDependencies": {
+    "openclaw": ">=2026.10.3"
+  },
+  "peerDependenciesMeta": {
+    "openclaw": {
+      "optional": true
+    }
+  }
+}
