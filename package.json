@@ -2,7 +2,7 @@
   "name": "openclaw-plugin-session-link-notice",
   "version": "0.1.0",
   "type": "module",
-  "private": true,
+  "private": false,
   "description": "Deterministic channel-only links to OpenClaw sessions",
   "scripts": {
     "test": "node --test"
@@ -10,7 +10,15 @@
   "openclaw": {
     "extensions": [
       "./index.js"
-    ]
+    ],
+    "compat": {
+      "pluginApi": ">=2026.10.3",
+      "minGatewayVersion": "2026.10.3"
+    },
+    "build": {
+      "openclawVersion": "2026.10.3",
+      "pluginSdkVersion": "2026.10.3"
+    }
   },
   "peerDependencies": {
     "openclaw": ">=2026.10.3"
@@ -19,5 +27,34 @@
     "openclaw": {
       "optional": true
     }
+  },
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "notice.js",
+    "session-link.js",
+    "openclaw.plugin.json",
+    "docs",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=24.16.0"
+  },
+  "keywords": [
+    "openclaw",
+    "openclaw-plugin",
+    "session",
+    "discord",
+    "telegram"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coccoinomane/openclaw-plugin-session-link-notice.git"
+  },
+  "homepage": "https://github.com/coccoinomane/openclaw-plugin-session-link-notice#readme",
+  "bugs": {
+    "url": "https://github.com/coccoinomane/openclaw-plugin-session-link-notice/issues"
   }
 }
