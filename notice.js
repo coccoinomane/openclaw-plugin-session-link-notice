@@ -7,6 +7,7 @@ export const DEFAULTS = Object.freeze({
 export function options(raw = {}) {
   return {
     label: raw.label ?? DEFAULTS.label,
+    allowedAgentIds: raw.allowedAgentIds,
     onSessionStart: { enabled: raw.onSessionStart?.enabled ?? true },
     afterInactivity: {
       enabled: raw.afterInactivity?.enabled ?? false,
@@ -45,6 +46,9 @@ export function createNoticeHandler({ store, readSession, send, config, pluginOp
     const cfg = config();
     const opt = options(pluginOptions());
     if (!opt.onSessionStart.enabled && !opt.afterInactivity.enabled) return;
+    if (opt.allowedAgentIds !== undefined &&
+        (!Array.isArray(opt.allowedAgentIds) || typeof ctx.agentId !== 'string' ||
+         !opt.allowedAgentIds.includes(ctx.agentId))) return;
     const entry = await readSession(ctx, cfg);
     const sessionId = ctx.sessionId ?? event.sessionId;
     if (!entry || !eligible(ctx, entry, sessionId)) return;

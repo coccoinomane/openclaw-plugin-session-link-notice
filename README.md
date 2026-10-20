@@ -12,7 +12,7 @@ Jump from a chat message to its conversation in the OpenClaw Control UI. The plu
 Requires OpenClaw **2026.10.3+** and a configured `gateway.publicOrigin`. Links use your existing Control UI address and require normal access.
 
 ```bash
-openclaw plugins install git:github.com/coccoinomane/openclaw-plugin-session-link-notice@v0.1.0
+openclaw plugins install git:github.com/coccoinomane/openclaw-plugin-session-link-notice@v0.1.1
 openclaw config set plugins.entries.session-link-notice.hooks.allowConversationAccess true
 ```
 
@@ -31,5 +31,7 @@ Under `plugins.entries.session-link-notice.config`, the defaults are:
 ```
 
 The switches are independent. Enable `afterInactivity` for a fresh link on the first request after an hour of silence. Routing follows the current channel and thread; no per-channel plugin setup is needed.
+
+To restrict notices to one agent, add `"allowedAgentIds": ["main"]` to the same config. Omit it for all agents, or use `[]` to disable notices for everyone.
 
 [Technical details and testing](docs/technical.md) · [MIT license](LICENSE)

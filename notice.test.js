@@ -151,3 +151,38 @@ test('cross-instance reservation suppresses duplicate first notice', async () =>
   const rows = new Map(), a = fixture({}, rows), b = fixture({}, rows);
   await Promise.all([a.run(), b.run()]); assert.equal(a.sent.length + b.sent.length, 1);
 });
+
+for (const agentId of ['main', 'famiglia', 'mamma']) {
+  test('omitted agent filter preserves notifications for ' + agentId, async () => {
+    const f = fixture(); f.ctx.agentId = agentId;
+    await f.run(); assert.equal(f.sent.length, 1);
+  });
+}
+test('main-only filter allows main', async () => {
+  const f = fixture({ allowedAgentIds: ['main'] });
+  await f.run(); assert.equal(f.sent.length, 1);
+});
+for (const agentId of ['famiglia', 'mamma', 'main-other', undefined]) {
+  test('main-only filter rejects before session/state access: ' + agentId, async () => {
+    const f = fixture({ allowedAgentIds: ['main'] }); f.ctx.agentId = agentId;
+    let reads = 0; f.args.readSession = async () => { reads++; return f.entry; }; f.reload();
+    await f.run(); assert.equal(reads, 0); assert.equal(f.rows.size, 0); assert.equal(f.sent.length, 0);
+  });
+}
+for (const allowedAgentIds of [[], null, 'main']) {
+  test('empty or invalid filter denies all: ' + JSON.stringify(allowedAgentIds), async () => {
+    const f = fixture({ allowedAgentIds }); await f.run();
+    assert.equal(f.rows.size, 0); assert.equal(f.sent.length, 0);
+  });
+}
+test('agent filter does not re-enable subagents', async () => {
+  const f = fixture({ allowedAgentIds: ['main'] }); f.entry.spawnDepth = 1;
+  await f.run(); assert.equal(f.sent.length, 0); assert.equal(f.rows.size, 0);
+});
+test('live options update excludes an agent without touching its idle state', async () => {
+  const opt = { afterInactivity: { enabled: true, minutes: 1 } };
+  const f = fixture(opt); f.ctx.agentId = 'mamma'; await f.run();
+  const before = JSON.stringify([...f.rows]);
+  opt.allowedAgentIds = ['main']; f.advance(60001); await f.run();
+  assert.equal(f.sent.length, 1); assert.equal(JSON.stringify([...f.rows]), before);
+});

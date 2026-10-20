@@ -2,7 +2,7 @@
   "id": "session-link-notice",
   "name": "Session Link Notice",
   "description": "Channel-only session links on first request or after inactivity. No tools or prompt contributions.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
@@ -38,6 +38,15 @@
             "default": 60
           }
         }
+      },
+      "allowedAgentIds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uniqueItems": true,
+        "description": "Agent IDs allowed to send notices. Omit for all agents; an empty list disables notices."
       }
     }
   },
@@ -55,6 +64,10 @@
     },
     "afterInactivity.minutes": {
       "label": "Inactivity threshold (minutes)"
+    },
+    "allowedAgentIds": {
+      "label": "Allowed agent IDs",
+      "help": "For example [\"main\"]. Omit for all agents; [] disables notices."
     }
   },
   "activation": {

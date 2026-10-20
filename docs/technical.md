@@ -18,6 +18,8 @@ Configure under plugins.entries.session-link-notice.config:
 }
 ~~~
 
+Optional `allowedAgentIds` restricts notices to exact runtime agent IDs, for example `["main"]`. Omission allows all agents; `[]` allows none. With a configured list, a missing agent ID is rejected. The check runs before reading the session, touching notification state, or sending. Subagent exclusions still apply.
+
 The switches are independent. Enable either, both, or neither. Inactivity is measured between eligible human turns, not between notices. The threshold only matters when inactivity notices are enabled. A first request does not count as returning after inactivity.
 
 The URL comes from OpenClaw's gateway.publicOrigin and gateway.controlUi.basePath through public SDK helpers. No duplicate URL setting, token, localhost fallback, or channel-specific credentials are needed. A disabled Control UI or missing public origin suppresses the notice.
