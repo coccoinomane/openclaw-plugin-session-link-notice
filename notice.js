@@ -8,6 +8,7 @@ export function options(raw = {}) {
   return {
     label: raw.label ?? DEFAULTS.label,
     allowedAgentIds: raw.allowedAgentIds,
+    allowedChannels: raw.allowedChannels,
     onSessionStart: { enabled: raw.onSessionStart?.enabled ?? true },
     afterInactivity: {
       enabled: raw.afterInactivity?.enabled ?? false,
@@ -49,6 +50,9 @@ export function createNoticeHandler({ store, readSession, send, config, pluginOp
     if (opt.allowedAgentIds !== undefined &&
         (!Array.isArray(opt.allowedAgentIds) || typeof ctx.agentId !== 'string' ||
          !opt.allowedAgentIds.includes(ctx.agentId))) return;
+    if (opt.allowedChannels !== undefined &&
+        (!Array.isArray(opt.allowedChannels) || typeof ctx.channel !== 'string' ||
+         !opt.allowedChannels.includes(ctx.channel))) return;
     const entry = await readSession(ctx, cfg);
     const sessionId = ctx.sessionId ?? event.sessionId;
     if (!entry || !eligible(ctx, entry, sessionId)) return;

@@ -2,7 +2,7 @@
   "id": "session-link-notice",
   "name": "Session Link Notice",
   "description": "Channel-only session links on first request or after inactivity. No tools or prompt contributions.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
@@ -47,6 +47,15 @@
         },
         "uniqueItems": true,
         "description": "Agent IDs allowed to send notices. Omit for all agents; an empty list disables notices."
+      },
+      "allowedChannels": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uniqueItems": true,
+        "description": "Channel provider IDs allowed to send notices, for example discord or telegram. Omit for all eligible channels; an empty list disables notices."
       }
     }
   },
@@ -68,6 +77,10 @@
     "allowedAgentIds": {
       "label": "Allowed agent IDs",
       "help": "For example [\"main\"]. Omit for all agents; [] disables notices."
+    },
+    "allowedChannels": {
+      "label": "Allowed channels",
+      "help": "Exact provider IDs, for example [\"discord\"]. Not conversation IDs. Omit for all eligible channels; [] disables notices."
     }
   },
   "activation": {

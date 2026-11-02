@@ -186,3 +186,55 @@ test('live options update excludes an agent without touching its idle state', as
   opt.allowedAgentIds = ['main']; f.advance(60001); await f.run();
   assert.equal(f.sent.length, 1); assert.equal(JSON.stringify([...f.rows]), before);
 });
+
+for (const channel of ['discord', 'telegram', 'slack']) {
+  test('channel allowlist accepts configured provider: ' + channel, async () => {
+    const f = fixture({ allowedChannels: [channel] });
+    f.ctx.channel = f.entry.delivery.context.channel = channel;
+    await f.run(); assert.equal(f.sent.length, 1);
+    assert.equal(f.sent[0].channel, channel); assert.equal(f.sent[0].threadId, 'thread-1');
+  });
+}
+for (const channel of ['telegram', 'slack', undefined, 'Discord', 'channel:123']) {
+  test('discord-only filter rejects before session or state access: ' + channel, async () => {
+    const f = fixture({ allowedChannels: ['discord'] }); f.ctx.channel = channel;
+    let reads = 0; f.args.readSession = async () => { reads++; return f.entry; }; f.reload();
+    await f.run(); assert.equal(reads, 0); assert.equal(f.rows.size, 0); assert.equal(f.sent.length, 0);
+  });
+}
+for (const allowedChannels of [[], null, 'discord', {}, ['unknown-provider']]) {
+  test('empty, invalid or unmatched channel filter denies: ' + JSON.stringify(allowedChannels), async () => {
+    const f = fixture({ allowedChannels }); await f.run();
+    assert.equal(f.rows.size, 0); assert.equal(f.sent.length, 0);
+  });
+}
+for (const channel of ['discord', 'telegram']) {
+  test('multiple allowed channels include ' + channel, async () => {
+    const f = fixture({ allowedChannels: ['discord', 'telegram'] });
+    f.ctx.channel = f.entry.delivery.context.channel = channel;
+    await f.run(); assert.equal(f.sent.length, 1);
+  });
+}
+for (const [agentId, channel, expected] of [['main', 'discord', 1], ['mamma', 'discord', 0], ['main', 'telegram', 0]]) {
+  test('agent and channel filters intersect: ' + agentId + '/' + channel, async () => {
+    const f = fixture({ allowedAgentIds: ['main'], allowedChannels: ['discord'] });
+    f.ctx.agentId = agentId; f.ctx.channel = f.entry.delivery.context.channel = channel;
+    await f.run(); assert.equal(f.sent.length, expected);
+    if (!expected) assert.equal(f.rows.size, 0);
+  });
+}
+test('allowed current channel cannot send to a mismatched saved route', async () => {
+  const f = fixture({ allowedChannels: ['discord'] }); f.entry.delivery.context.channel = 'telegram';
+  await f.run(); assert.equal(f.rows.size, 0); assert.equal(f.sent.length, 0);
+});
+test('explicit channel allowlist does not bypass internal-channel exclusions', async () => {
+  const f = fixture({ allowedChannels: ['webchat'] });
+  f.ctx.channel = f.entry.delivery.context.channel = 'webchat';
+  await f.run(); assert.equal(f.rows.size, 0); assert.equal(f.sent.length, 0);
+});
+test('channel filter leaves excluded idle state unchanged', async () => {
+  const opt = { afterInactivity: { enabled: true, minutes: 1 } };
+  const f = fixture(opt); await f.run(); const before = JSON.stringify([...f.rows]);
+  opt.allowedChannels = ['telegram']; f.advance(60001); await f.run();
+  assert.equal(f.sent.length, 1); assert.equal(JSON.stringify([...f.rows]), before);
+});
